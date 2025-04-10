@@ -16,10 +16,14 @@ Friend Requests
 Notifications
 Privacy Settings
 Real-time updates
+
+
+
 Step 1: Setting Up the Project
 Initialize the Project:
 
 bash
+
 mkdir social-network
 cd social-network
 npm init -y
