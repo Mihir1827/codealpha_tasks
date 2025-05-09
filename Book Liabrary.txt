@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Personal Book Library</title>
+<style>
+  /* Reset */
+  * {
+    box-sizing: border-box;
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body {
+    background: linear-gradient(135deg, #6B91EA, #B7CFFF);
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 10px;
+  }
+  #app {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+    width: 350px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header {
+    background: #5271FF;
+    color: #fff;
+    padding: 18px 20px;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    text-align: center;
+    user-select: none;
+  }
+  .search-category {
+    padding: 15px 20px;
+    background: #F5F8FF;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .search-category input[type="text"], .search-category select {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    transition: border-color 0.3s ease;
+  }
+  .search-category input[type="text"]:focus, .search-category select:focus {
+    border-color: #5271FF;
+    outline: none;
+  }
+  .add-book-section {
+    padding: 15px 20px;
+    background: #E9EFFD;
+    border-top: 2px solid #5271FF;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .add-book-section input, .add-book-section select {
+    padding: 6px 10px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    border: 1px solid #aaa;
+  }
+  .add-book-section button {
+    margin-top: 10px;
+    background: #5271FF;
+    border: none;
+    color: white;
+    padding: 10px 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  .add-book-section button:hover {
+    background: #3b54c3;
+  }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px 20px;
+  }
+  .book-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .book-item {
+    background: #F0F4FF;
+    padding: 14px 16px;
+    border-radius: 10px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+  }
+  .book-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .book-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2C3B7A;
+    max-width: 65%;
+  }
+  .book-author {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #536DA7;
+  }
+  .book-category {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #7A8AB8;
+  }
+  .book-actions {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .btn {
+    font-size: 0.9rem;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  .btn-borrow {
+    background: #5271FF;
+    color: white;
+  }
+  .btn-borrow:hover {
+    background: #3b54c3;
+  }
+  .btn-return {
+    background: #f44336;
+    color: white;
+  }
+  .btn-return:hover {
+    background: #b32a1a;
+  }
+  .btn-history {
+    background: #828282;
+    color: white;
+  }
+  .btn-history:hover {
+    background: #565656;
+  }
+  /* Modal styles */
+  .modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10,10,25,0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    width: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .modal-header {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #5271FF;
+    margin-bottom: 12px;
+  }
+  .modal-close {
+    cursor: pointer;
+    font-weight: 700;
+    float: right;
+    font-size: 1.4rem;
+    color: #5271FF;
+    user-select: none;
+  }
+  .history-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    font-size: 0.95rem;
+    color: #40507a;
+  }
+  .history-item:last-child {
+    border-bottom: none;
+  }
+  .empty-placeholder {
+    font-style: italic;
+    color: #999999;
+    text-align: center;
+    margin-top: 20px;
+  }
+  /* Scrollbar Styling for Webkit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #eef3ff;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #5271FF;
+    border-radius: 4px;
+  }
+  /* Responsive tweaks */
+  @media screen and (max-width: 375px) {
+    #app {
+      width: 95vw;
+      max-height: 600px;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app" role="main" aria-label="Personal book library application">
+  <header>MY BOOK LIBRARY</header>
+
+  <section class="search-category" aria-label="Search and filter books">
+    <input type="text" id="searchInput" placeholder="Search by title, author..." aria-label="Search books" />
+    <select id="categoryFilter" aria-label="Filter books by category">
+      <option value="">All categories</option>
+    </select>
+  </section>
+
+  <section class="add-book-section" aria-label="Add new book to library">
+    <input type="text" id="newTitle" placeholder="Book Title" aria-label="New book title" />
+    <input type="text" id="newAuthor" placeholder="Author" aria-label="New book author" />
+    <select id="newCategory" aria-label="Select category for new book">
+      <option value="" disabled selected>Select Category</option>
+    </select>
+    <button id="addBookBtn" aria-label="Add book">Add Book</button>
+  </section>
+
+  <main>
+    <ul class="book-list" id="bookList" aria-live="polite" aria-relevant="additions"></ul>
+  </main>
+</div>
+
+<div id="historyModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="historyTitle" style="display:none;">
+  <div class="modal-content">
+    <span class="modal-close" id="modalClose" role="button" tabindex="0" aria-label="Close borrowing history">&times;</span>
+    <h2 id="historyTitle">Borrowing History</h2>
+    <div id="historyContent">
+      <!-- History items inserted here -->
+    </div>
+  </div>
+</div>
+
